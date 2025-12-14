@@ -12,11 +12,6 @@ export const routes: Routes = [
       .then(m => m.Upload)
   },
   {
-    path: 'result/:id',
-    loadComponent: () => import('./pages/result/result')
-      .then(m => m.Result)
-  },
-  {
     path: 'history',
     loadComponent: () => import('./pages/history/history')
       .then(m => m.History)
