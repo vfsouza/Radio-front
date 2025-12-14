@@ -1,0 +1,170 @@
+<div class="modal-overlay" (click)="cancel()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Informações da Análise</h2>
+      <button class="close-button" (click)="cancel()" title="Fechar">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="info-section">
+        <p class="file-info">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <strong>Arquivo:</strong> {{ fileName }}
+        </p>
+        <p class="detections-info">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <strong>Detecções da IA:</strong> {{ getDetectionsSummary() }}
+        </p>
+      </div>
+
+      @if (imageUrl) {
+        <div class="image-preview">
+          <h3>Radiografia com Detecções</h3>
+          <div class="image-container">
+            <img [src]="imageUrl" [alt]="fileName" class="detection-image">
+          </div>
+        </div>
+      }
+
+      <form class="detection-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="patientName">Nome do Paciente</label>
+            <input
+              id="patientName"
+              type="text"
+              [(ngModel)]="formData.patientName"
+              name="patientName"
+              placeholder="Nome completo"
+              class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label for="patientId">ID do Paciente</label>
+            <input
+              id="patientId"
+              type="text"
+              [(ngModel)]="formData.patientId"
+              name="patientId"
+              placeholder="P-2024-0001"
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bodyRegion">Região do Corpo *</label>
+            <input
+              id="bodyRegion"
+              type="text"
+              [(ngModel)]="formData.bodyRegion"
+              name="bodyRegion"
+              placeholder="Ex: Antebraço Direito, Tornozelo Esquerdo"
+              class="form-input"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="fractureType">Tipo de Fratura</label>
+            <input
+              id="fractureType"
+              type="text"
+              [(ngModel)]="formData.fractureType"
+              name="fractureType"
+              placeholder="Ex: Fratura de Rádio Distal"
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fractureLocation">Localização Específica</label>
+          <input
+            id="fractureLocation"
+            type="text"
+            [(ngModel)]="formData.fractureLocation"
+            name="fractureLocation"
+            placeholder="Ex: Terço distal do rádio"
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label>Severidade *</label>
+          <div class="severity-options">
+            <label class="severity-option" [class.selected]="formData.severity === 'low'">
+              <input
+                type="radio"
+                name="severity"
+                value="low"
+                [(ngModel)]="formData.severity">
+              <div class="severity-card low">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Leve</span>
+              </div>
+            </label>
+
+            <label class="severity-option" [class.selected]="formData.severity === 'medium'">
+              <input
+                type="radio"
+                name="severity"
+                value="medium"
+                [(ngModel)]="formData.severity">
+              <div class="severity-card medium">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>Moderada</span>
+              </div>
+            </label>
+
+            <label class="severity-option" [class.selected]="formData.severity === 'high'">
+              <input
+                type="radio"
+                name="severity"
+                value="high"
+                [(ngModel)]="formData.severity">
+              <div class="severity-card high">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Grave</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="formData.saveToHistory"
+              name="saveToHistory">
+            <span>Salvar esta análise no histórico</span>
+          </label>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="cancel()">
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="confirm()"
+        [disabled]="!formData.bodyRegion">
+        Confirmar
+      </button>
+    </div>
+  </div>
+</div>

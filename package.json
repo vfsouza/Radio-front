@@ -5,8 +5,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "docker:build": "docker build -t radio-app .",
+    "docker:run": "docker run -p 8080:8080 radio-app"
   },
   "prettier": {
     "printWidth": 100,
@@ -29,7 +32,11 @@
     "@angular/forms": "^21.0.0",
     "@angular/platform-browser": "^21.0.0",
     "@angular/router": "^21.0.0",
+    "@tailwindcss/postcss": "^4.1.18",
+    "jspdf": "^3.0.4",
+    "postcss": "^8.5.6",
     "rxjs": "~7.8.0",
+    "tailwindcss": "^4.1.18",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

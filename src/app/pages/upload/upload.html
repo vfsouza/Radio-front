@@ -1,0 +1,127 @@
+<div class="upload-container">
+  <div class="upload-header">
+    <h1>Upload de Radiografias</h1>
+    <p class="subtitle">Arraste suas radiografias ou clique para selecionar</p>
+  </div>
+
+  <div
+    class="dropzone"
+    [class.dragover]="isDragging"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()">
+
+    <input
+      #fileInput
+      type="file"
+      multiple
+      accept="image/*"
+      (change)="onFileSelected($event)"
+      style="display: none">
+
+    <div class="dropzone-content">
+      <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+      </svg>
+      <p class="dropzone-text">Arraste e solte suas radiografias aqui</p>
+      <p class="dropzone-subtext">ou</p>
+      <button type="button" class="select-button">Selecione os arquivos</button>
+      <p class="file-types">PNG, JPG, DICOM até 10MB</p>
+    </div>
+  </div>
+
+  @if (selectedFiles.length > 0) {
+    <div class="preview-section">
+      <h2>Radiografias Selecionadas ({{ selectedFiles.length }})</h2>
+      <div class="preview-grid">
+        @for (file of selectedFiles; track file.name; let i = $index) {
+          <div class="preview-card" [class.uploading]="file.uploading" [class.upload-success]="file.uploadSuccess" [class.upload-error]="file.uploadError">
+            <div class="preview-image-container">
+              <img [src]="file.annotatedImage || file.preview" [alt]="file.name" class="preview-image">
+
+              @if (file.uploading) {
+                <div class="upload-overlay">
+                  <div class="spinner"></div>
+                  <p>Analisando...</p>
+                </div>
+              }
+
+              @if (file.uploadSuccess) {
+                <div class="upload-status success">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              }
+
+              @if (file.uploadError) {
+                <div class="upload-status error">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              }
+
+              @if (!file.uploading) {
+                <button
+                  type="button"
+                  class="remove-button"
+                  (click)="removeFile(i)"
+                  title="Remover radiografia">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" fill="none" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              }
+            </div>
+            <div class="preview-info">
+              <p class="file-name">{{ file.name }}</p>
+              <p class="file-size">{{ formatFileSize(file.size) }}</p>
+              @if (file.uploadError) {
+                <p class="error-message">{{ file.uploadError }}</p>
+              }
+              @if (file.detections && file.detections.length > 0) {
+                <div class="detections-summary">
+                  <p class="detection-count">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ file.detections.length }} detecção(ões) encontrada(s)
+                  </p>
+                  @for (detection of file.detections; track $index) {
+                    <p class="detection-item">
+                      • {{ detection.class_name }} - {{ (detection.confidence * 100).toFixed(1) }}%
+                    </p>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="action-buttons">
+        <button type="button" class="btn-secondary" (click)="clearAll()" [disabled]="isUploading">
+          Limpar Tudo
+        </button>
+        <button type="button" class="btn-primary" (click)="uploadFiles()" [disabled]="isUploading">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" fill="none" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          Analisar Radiografias
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (showModal && currentFilePreview) {
+    <app-detection-modal
+      [detections]="currentFilePreview.detections || []"
+      [fileName]="currentFilePreview.name"
+      [imageUrl]="currentFilePreview.annotatedImage || currentFilePreview.preview"
+      (onConfirm)="onModalConfirm($event)"
+      (onCancel)="onModalCancel()">
+    </app-detection-modal>
+  }
+</div>
